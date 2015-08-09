@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.List;
@@ -39,12 +40,24 @@ public class CrimeListFragment extends Fragment {
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder {
-        public TextView mTitleTextView;
+        private TextView mTitleTextView;
+        private TextView mDateTextView;
+        private CheckBox mSolvedCheckBox;
+        private Crime mCrime;
 
         public CrimeHolder(View itemView) {
             super(itemView);
 
-            mTitleTextView = (TextView) itemView;
+            mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
+            mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
+            mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
+        }
+
+        public void bindCrime(Crime crime){
+            mCrime = crime;
+            mTitleTextView.setText(crime.getTitle());
+            mDateTextView.setText(crime.getDate().toString());
+            mSolvedCheckBox.setChecked(crime.isSolved());
         }
     }
 
@@ -55,11 +68,10 @@ public class CrimeListFragment extends Fragment {
             mCrimes = crimes;
         }
 
-
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater.inflate(android.R.layout.simple_list_item_1, viewGroup, false);
+            View view = layoutInflater.inflate(R.layout.list_item_crime, viewGroup, false);
 
             return new CrimeHolder(view);
         }
@@ -67,7 +79,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onBindViewHolder(CrimeHolder crimeHolder, int i) {
             Crime crime = mCrimes.get(i);
-            crimeHolder.mTitleTextView.setText(crime.getTitle());
+            crimeHolder.bindCrime(crime);
         }
 
         @Override
