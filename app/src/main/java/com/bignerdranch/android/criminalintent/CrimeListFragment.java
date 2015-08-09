@@ -18,8 +18,6 @@ import java.util.List;
  */
 public class CrimeListFragment extends Fragment {
 
-    private int lastCrimeDetail;
-
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
 
@@ -50,7 +48,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }
         else
-            mAdapter.notifyItemChanged(lastCrimeDetail);
+            mAdapter.notifyDataSetChanged();
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -79,7 +77,6 @@ public class CrimeListFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
-            lastCrimeDetail = getAdapterPosition();
             startActivity(intent);
         }
     }
