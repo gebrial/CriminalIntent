@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -27,12 +28,15 @@ public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_TIME = "DialogTime";
 
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_TIME = 1;
 
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
 
     public static CrimeFragment newInstance(UUID crimeId){
@@ -86,6 +90,18 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mTimeButton = (Button) v.findViewById(R.id.crime_time);
+        updateTime();
+        mTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME);
+                dialog.show(fragmentManager, DIALOG_TIME);
+            }
+        });
+
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -106,7 +122,27 @@ public class CrimeFragment extends Fragment {
         if(requestCode == REQUEST_DATE){
             mCrime.setDate((Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE));
             updateDate();
+        } else if (requestCode == REQUEST_TIME){
+            int hour = data.getIntExtra(TimePickerFragment.EXTRA_HOUR, 0);
+            int minute = data.getIntExtra(TimePickerFragment.EXTRA_MINUTE, 0);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mCrime.getDate());
+            calendar.set(Calendar.HOUR_OF_DAY, hour);
+            calendar.set(Calendar.MINUTE, minute);
+
+            mCrime.setDate(calendar.getTime());
+            updateTime();
         }
+    }
+
+    private void updateTime(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(mCrime.getDate());
+
+        mTimeButton.setText(calendar.get(Calendar.HOUR_OF_DAY) + ":" +
+                            calendar.get(Calendar.MINUTE) + ":" +
+                            calendar.get(Calendar.SECOND));
     }
 
     private void updateDate() {
