@@ -140,9 +140,12 @@ public class CrimeFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(mCrime.getDate());
 
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+
         mTimeButton.setText(calendar.get(Calendar.HOUR_OF_DAY) + ":" +
-                            calendar.get(Calendar.MINUTE) + ":" +
-                            calendar.get(Calendar.SECOND));
+                ((minute<10)?"0":"") + minute + ":" +
+                ((second<10)?"0":"") + second);
     }
 
     private void updateDate() {
