@@ -32,6 +32,7 @@ public class CrimeFragment extends Fragment {
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
+    private static final int REQUEST_DATE_ACTIVITY = 2;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -83,10 +84,17 @@ public class CrimeFragment extends Fragment {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 FragmentManager fragmentManager = getFragmentManager();
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
                 dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
                 dialog.show(fragmentManager, DIALOG_DATE);
+                */
+                // TODO uncomment to create dialog
+
+                startActivityForResult(DatePickerActivity.newIntent(getActivity(), mCrime.getDate()),
+                        REQUEST_DATE_ACTIVITY);
+
             }
         });
 
@@ -119,7 +127,7 @@ public class CrimeFragment extends Fragment {
         if(resultCode != Activity.RESULT_OK)
             return;
 
-        if(requestCode == REQUEST_DATE){
+        if(requestCode == REQUEST_DATE || requestCode == REQUEST_DATE_ACTIVITY){
             mCrime.setDate((Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE));
             updateDate();
         } else if (requestCode == REQUEST_TIME){
