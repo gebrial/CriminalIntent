@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ public class DatePickerFragment extends DialogFragment {
     private Date mDate;
 
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         /*View view = LayoutInflater.from(getActivity())
@@ -96,8 +98,11 @@ public class DatePickerFragment extends DialogFragment {
                 calendar2.set(Calendar.DAY_OF_MONTH, mDatePicker.getDayOfMonth());
 
                 sendResult(Activity.RESULT_OK, calendar2.getTime());
-                //dismiss();
-                getActivity().finish();
+
+                if(getTargetFragment() != null)
+                    dismiss();
+                else
+                    getActivity().finish();
             }
         });
 

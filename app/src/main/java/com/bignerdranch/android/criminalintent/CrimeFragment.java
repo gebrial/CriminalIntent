@@ -40,6 +40,8 @@ public class CrimeFragment extends Fragment {
     private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
 
+    private boolean mIsLargeLayout;
+
     public static CrimeFragment newInstance(UUID crimeId){
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_CRIME_ID, crimeId);
@@ -54,6 +56,8 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+
+        mIsLargeLayout = getResources().getBoolean(R.bool.large_layout);
     }
 
     @Override
@@ -84,16 +88,14 @@ public class CrimeFragment extends Fragment {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                FragmentManager fragmentManager = getFragmentManager();
-                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-                dialog.show(fragmentManager, DIALOG_DATE);
-                */
-                // TODO uncomment to create dialog
-
-                startActivityForResult(DatePickerActivity.newIntent(getActivity(), mCrime.getDate()),
-                        REQUEST_DATE_ACTIVITY);
+                if(mIsLargeLayout) {
+                    FragmentManager fragmentManager = getFragmentManager();
+                    DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                    dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                    dialog.show(fragmentManager, DIALOG_DATE);
+                } else
+                    startActivityForResult(DatePickerActivity.newIntent(getActivity(), mCrime.getDate()),
+                            REQUEST_DATE_ACTIVITY);
 
             }
         });
