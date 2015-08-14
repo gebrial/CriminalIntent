@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
@@ -42,6 +43,10 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
+
+    private long mContactId;
+    private String mTelephoneNumber;
 
     public static CrimeFragment newInstance(UUID crimeId){
         Bundle bundle = new Bundle();
@@ -150,6 +155,17 @@ public class CrimeFragment extends Fragment {
                 PackageManager.MATCH_DEFAULT_ONLY) == null)
             mSuspectButton.setEnabled(false);
 
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setEnabled(mTelephoneNumber != null);
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent callSuspect = new Intent(Intent.ACTION_DIAL,
+                        Uri.parse("tel:" + mTelephoneNumber));
+                startActivity(callSuspect);
+            }
+        });
+
         return v;
     }
 
@@ -163,7 +179,10 @@ public class CrimeFragment extends Fragment {
             updateDate();
         } else if (requestCode ==  REQUEST_CONTACT && data != null){
             Uri contactUri = data.getData();
-            String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+
+            // Get suspect name and contact id
+            String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME,
+                                                ContactsContract.Contacts._ID};
             Cursor c = getActivity().getContentResolver()
                     .query(contactUri, queryFields, null, null, null);
 
@@ -175,6 +194,26 @@ public class CrimeFragment extends Fragment {
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
+
+                mContactId = c.getLong(1);
+            } finally {
+                c.close();
+            }
+
+            // Get suspect telephone number to dial
+            c = getActivity().getContentResolver()
+                    .query(CommonDataKinds.Phone.CONTENT_URI,
+                            new String[]{CommonDataKinds.Phone.NUMBER},
+                            CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{Long.toString(mContactId)},
+                            null);
+
+            try{
+                if(c.getCount() == 0)
+                    return;
+
+                c.moveToFirst();
+                mTelephoneNumber = c.getString(0);
+                mCallSuspectButton.setEnabled(mTelephoneNumber != null);
             } finally {
                 c.close();
             }
